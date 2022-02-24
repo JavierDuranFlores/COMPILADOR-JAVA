@@ -5,6 +5,7 @@
  */
 package mx.unach.vista;
 
+import mx.unach.vista.utilerias.NumeroLinea;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -36,6 +37,7 @@ import javax.swing.table.TableColumnModel;
 import javax.xml.bind.Marshaller;
 import mx.unach.compilador.Token;
 import mx.unach.compilador.lexico.AnalizadorLexico;
+import mx.unach.vista.utilerias.MiRenderer;
 
 /**
  *
@@ -66,7 +68,7 @@ public class Principal {
     private JPanel panelTablaTokens;
     private String columnasTT[] = {"Nombre Token", "Valor Token"};
     private DefaultTableModel dtmTT = new DefaultTableModel(null, columnasTT);
-    private String columnasTE[] = {"Linea", "Descripcion"};
+    private String columnasTE[] = {"Linea", "Columana" , "Descripcion"};
     private DefaultTableModel dtmTE = new DefaultTableModel(null, columnasTE);
 
     // Footer
@@ -318,6 +320,16 @@ public class Principal {
 
     }
     
+    public void limpiarTablaErrores() {
+        int nColumn = dtmTE.getRowCount() - 1;
+        if (nColumn >= 0) {
+            for (int i = nColumn; i >= 0; i--) {
+                dtmTE.removeRow(i);
+            }
+        }
+
+    }
+    
     // Metodo en donde se agrega los paneles de la parte de abajo
     private void componentesFooter() {
         JPanel panelBotonesBorder = new JPanel(new BorderLayout());
@@ -366,7 +378,7 @@ public class Principal {
 
     private ActionListener eventoBotonLexico() {
         return (ae) -> {
-            AnalizadorLexico analizadorLexico = new AnalizadorLexico();
+            AnalizadorLexico analizadorLexico = new AnalizadorLexico(this);
             analizadorLexico.setBuffer(editor.getText());
             limpiarTabla();
             List<Token> tokens = analizadorLexico.siguienteToken();
@@ -377,6 +389,21 @@ public class Principal {
                 dtmTT.addRow(token);
 
             }
+            limpiarTablaErrores();
+            List<mx.unach.compilador.Error> errores = analizadorLexico.getListaErrores();
+            String error[] = new String[3];
+            for (int i = 0; i < errores.size(); i++) {
+                error[0] = String.valueOf(errores.get(i).getFila());
+                
+                if (i == 0)
+                    error[1] = String.valueOf(errores.get(i).getColumna()+1);
+                else 
+                    error[1] = String.valueOf(errores.get(i).getColumna());
+                
+                error[2] = errores.get(i).getDescripcion();
+                dtmTE.addRow(error);
+
+            }
 
         };
     }
@@ -385,10 +412,12 @@ public class Principal {
         panelTablaErrores.setBackground(fondo);
         panelTablaErrores.setPreferredSize(new Dimension(450, 30));
         tablaErrores = new JTable(dtmTE);
+        tablaErrores.setDefaultRenderer(Object.class, new MiRenderer());
         TableColumnModel tcm = tablaErrores.getColumnModel();
 
         tcm.getColumn(0).setPreferredWidth(40);
-        tcm.getColumn(1).setPreferredWidth(410);
+        tcm.getColumn(1).setPreferredWidth(60);
+        tcm.getColumn(2).setPreferredWidth(350);
 
         JPanel panelBorder = new JPanel(new BorderLayout());
         panelBorder.setBackground(fondo);
@@ -418,5 +447,9 @@ public class Principal {
             editor.setText("");
             limpiarTabla();
         };
+    }
+
+    public JTextArea getEditor() {
+        return editor;
     }
 }

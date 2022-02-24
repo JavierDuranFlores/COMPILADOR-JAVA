@@ -1,4 +1,4 @@
-package mx.unach.vista;
+package mx.unach.vista.utilerias;
 
 import java.awt.*;
 import java.beans.*;
@@ -83,7 +83,7 @@ public class NumeroLinea extends JPanel
     public Color getCurrentLineForeground() {
         return currentLineForeground == null ? getForeground() : currentLineForeground;
     }
-
+    
     
     public void setCurrentLineForeground(Color currentLineForeground) {
         this.currentLineForeground = currentLineForeground;

@@ -5,12 +5,18 @@
  */
 package mx.unach.compilador.lexico;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.text.BadLocationException;
 import mx.unach.compilador.Token;
+import mx.unach.vista.Principal;
+import mx.unach.compilador.Error;
 
 /**
  *
@@ -26,17 +32,26 @@ public class AnalizadorLexico {
     private Hashtable tablaSimbolos;
     private Hashtable tablaDelimitadores;
     private Hashtable tablaAritmeticos;
+    private Integer linea;
+    private Integer columna;
 
     private List<Token> listaTokens;
+    private List<Error> listaErrores;
 
-    public AnalizadorLexico() {
+    private Principal principal;
+
+    public AnalizadorLexico(Principal principal) {
         this.buffer = new LinkedList();
         this.listaTokens = new ArrayList<>();
+        this.listaErrores = new ArrayList<>();
         this.estado = 0;
         this.caracter = ' ';
         this.tablaSimbolos = new Hashtable();
         this.tablaDelimitadores = new Hashtable();
         this.tablaAritmeticos = new Hashtable();
+        this.principal = principal;
+        this.linea = 0;
+        this.columna = 0;
 
         reservarTablaSimbolos(new Token("Palabra Reservada", "ita"));
         reservarTablaSimbolos(new Token("Palabra Reservada", "aliter"));
@@ -98,8 +113,9 @@ public class AnalizadorLexico {
 
     public void setBuffer(String texto) {
 
-        for (int i = 0; i < texto.length(); i++)
+        for (int i = 0; i < texto.length(); i++) {
             buffer.add(texto.charAt(i));
+        }
         buffer.add(Character.MIN_VALUE);
     }
 
@@ -243,6 +259,10 @@ public class AnalizadorLexico {
                     break;
                 case 12:
                     caracter = siguienteCaracter();
+                    if (caracter == '\n') {
+                        linea++;
+                    }
+                    columna = 0;
                     removerCaracter();
                     estado = 0;
                     break;
@@ -338,6 +358,9 @@ public class AnalizadorLexico {
                         cifra.append(caracter);
                         removerCaracter();
                         estado = 21;
+                    } else if (caracter == '.') {
+                        listaErrores.add(new Error(linea + 1, columna, "Numero no valido"));
+                        estado = 26;
                     } else {
                         estado = 26;
                     }
@@ -387,7 +410,7 @@ public class AnalizadorLexico {
                 case 27:
                     caracter = siguienteCaracter();
                     if (caracter == '.') {
-                        listaTokens.add(new Token("Delimitadore", caracter.toString()));
+                        listaTokens.add(new Token("Delimitador", caracter.toString()));
                         removerCaracter();
                         estado = 27;
                     } else if (Character.isDigit(caracter)) {
@@ -399,9 +422,15 @@ public class AnalizadorLexico {
                     break;
 
             }
+            columna++;
         }
 
         return listaTokens;
 
     }
+
+    public List<Error> getListaErrores() {
+        return listaErrores;
+    }
+
 }

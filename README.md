@@ -45,7 +45,7 @@ reservarTablaSimbolos(new Token("Palabra Reservada", "si"));
 ## **Automatas Usados**
 ### Para identificar los operadores se usa este automata.
 
-![Automata-Operadores](/markdown/img/automata-operadores.png)
+![Automata-Operadores](automata-operadores.png)
 
 ### Este seria el codigo en Java del automata
 ```java
@@ -126,7 +126,7 @@ public List<Token> siguienteToken() {
 ```
 ### Para identificar las palabras reservas y los identificadores se usa este automata.
 
-![palabras-reservadas-y-identificadores](/markdown/img/automata-pr-y-id.png)
+![palabras-reservadas-y-identificadores](automata-pr-y-id.png)
 
 ### Este seria el codigo en Java del automata
 ```java
@@ -185,7 +185,7 @@ public List<Token> siguienteToken() {
 }
 ```
 ### Para identificar numeros se usa este automata.
-![numeros-sin-signo](/markdown/img/automata-sin-signo.png)
+![numeros-sin-signo](automata-sin-signo.png)
 ### Este seria el codigo en Java del automata
 ```java
 public List<Token> siguienteToken() {

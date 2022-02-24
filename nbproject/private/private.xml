@@ -4,8 +4,10 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/home/javier/Escritorio/Universidad/Sexto%20Semestre/COMPILADORES/Compilador/src/mx/unach/vista/Principal.java</file>
+            <file>file:/home/javier/Escritorio/Universidad/Sexto%20Semestre/COMPILADORES/Compilador/src/mx/unach/vista/utilerias/NumeroLinea.java</file>
+            <file>file:/home/javier/Escritorio/Universidad/Sexto%20Semestre/COMPILADORES/Compilador/src/mx/unach/vista/utilerias/MiRenderer.java</file>
+            <file>file:/home/javier/Escritorio/Universidad/Sexto%20Semestre/COMPILADORES/Compilador/src/mx/unach/compilador/Error.java</file>
             <file>file:/home/javier/Escritorio/Universidad/Sexto%20Semestre/COMPILADORES/Compilador/src/mx/unach/compilador/lexico/AnalizadorLexico.java</file>
-            <file>file:/home/javier/Escritorio/Universidad/Sexto%20Semestre/COMPILADORES/Compilador/src/mx/unach/main/Main.java</file>
         </group>
     </open-files>
 </project-private>
