@@ -8,6 +8,7 @@ package mx.unach.vista;
 import mx.unach.vista.utilerias.NumeroLinea;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -37,6 +38,7 @@ import javax.swing.table.TableColumnModel;
 import javax.xml.bind.Marshaller;
 import mx.unach.compilador.Token;
 import mx.unach.compilador.lexico.AnalizadorLexico;
+import mx.unach.compilador.sintactico.AnalizadorSintactico;
 import mx.unach.vista.utilerias.MiRenderer;
 
 /**
@@ -56,7 +58,7 @@ public class Principal {
     private JButton botonArchivo;
     private JButton botonNuevo;
     private JButton botonGuardar;
-    
+
     private JLabel etiquetaAbrir;
     private JLabel etiquetaNuevo;
     private JLabel etiquetaGuardar;
@@ -68,7 +70,7 @@ public class Principal {
     private JPanel panelTablaTokens;
     private String columnasTT[] = {"Nombre Token", "Valor Token"};
     private DefaultTableModel dtmTT = new DefaultTableModel(null, columnasTT);
-    private String columnasTE[] = {"Linea", "Columana" , "Descripcion"};
+    private String columnasTE[] = {"Linea", "Columana", "Descripcion"};
     private DefaultTableModel dtmTE = new DefaultTableModel(null, columnasTE);
 
     // Footer
@@ -86,11 +88,13 @@ public class Principal {
     private FileOutputStream salida;
     private File archivo;
     private JFileChooser seleccionado = new JFileChooser();
-    
+
     // Color fondo
     private Color fondo = new Color(53, 59, 72);
     private Color fondoBackBoton = new Color(64, 115, 158);
     private Color fondoForeBoton = new Color(220, 221, 225);
+
+    private List<Token> listaTokens;
 
     public void iniciarComponentes() {
 
@@ -103,7 +107,7 @@ public class Principal {
         componentesCabecera();
         componentesContenido();
         componentesFooter();
-        
+
         ventana.setResizable(false);
         ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         ventana.setVisible(true);
@@ -194,16 +198,16 @@ public class Principal {
         }
         return contendio;
     }
-    
+
     private String guardarTexto(File archivo, String contenido) {
-        String respuesta=null;
+        String respuesta = null;
         try {
             salida = new FileOutputStream(archivo);
             byte[] byteText = contenido.getBytes();
             salida.write(byteText);
             respuesta = "Se guardo con exito el Archivo";
-        }catch(Exception e){
-            
+        } catch (Exception e) {
+
         }
         return respuesta;
     }
@@ -224,10 +228,10 @@ public class Principal {
             public void actionPerformed(ActionEvent ae) {
 
                 editor.setText("");
-                
+
             }
         });
-        
+
     }
 
     private void botonGuardarArchivo() {
@@ -235,37 +239,37 @@ public class Principal {
         contenedor.setBackground(fondo);
         botonGuardar = new JButton("Guardar");
         etiquetaGuardar = new JLabel(new ImageIcon("src/mx/unach/imagenes/save.png"));
-        
+
         botonGuardar.setFont(new Font("Arial", 3, 10));
         botonGuardar.setBackground(fondoBackBoton);
         botonGuardar.setForeground(fondoForeBoton);
-        
+
         contenedor.add(etiquetaGuardar);
         contenedor.add(botonGuardar);
         panelBotonArchivo.add(contenedor);
-        
+
         botonGuardar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-           
-                 if (seleccionado.showDialog(null, "Guardar Archivo") == JFileChooser.APPROVE_OPTION) {
-                     archivo = seleccionado.getSelectedFile();
-                     if (archivo.getName().endsWith("txt")) {
-                         String contenido = editor.getText();
-                         String respuesta = guardarTexto(archivo, contenido);
-                         if (respuesta != null) {
-                             JOptionPane.showMessageDialog(null, respuesta);
-                         } else {
-                             JOptionPane.showMessageDialog(null, "Error al guardar el archivo");
-                         }
-                     } else {
-                         JOptionPane.showMessageDialog(null, "El texto se debe guardar en un formato texto");
-                     }
-                 }
-                
+
+                if (seleccionado.showDialog(null, "Guardar Archivo") == JFileChooser.APPROVE_OPTION) {
+                    archivo = seleccionado.getSelectedFile();
+                    if (archivo.getName().endsWith("txt")) {
+                        String contenido = editor.getText();
+                        String respuesta = guardarTexto(archivo, contenido);
+                        if (respuesta != null) {
+                            JOptionPane.showMessageDialog(null, respuesta);
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Error al guardar el archivo");
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(null, "El texto se debe guardar en un formato texto");
+                    }
+                }
+
             }
         });
-        
+
     }
 
     private void componentesContenido() {
@@ -275,6 +279,7 @@ public class Principal {
 
     private void editor() {
         editor = new JTextArea();
+        editor.setTabSize(3);
         editor.setFont(new Font("Source Sans Pro", 3, 12));
         editor.setForeground(new Color(220, 221, 225));
         nm = new NumeroLinea(editor);
@@ -282,6 +287,7 @@ public class Principal {
         nm.setForeground(Color.WHITE);
         jsp = new JScrollPane(editor);
         editor.setBackground(fondo);
+        editor.setText(abrirTexto(new File("hola.txt")));
         jsp.setRowHeaderView(nm);
         JPanel panelFlow = new JPanel(new FlowLayout());
         panelFlow.setPreferredSize(new Dimension(250, 540));
@@ -309,7 +315,7 @@ public class Principal {
 
         contendio.add(panelTablaTokens);
     }
-    
+
     public void limpiarTabla() {
         int nColumn = dtmTT.getRowCount() - 1;
         if (nColumn >= 0) {
@@ -319,7 +325,7 @@ public class Principal {
         }
 
     }
-    
+
     public void limpiarTablaErrores() {
         int nColumn = dtmTE.getRowCount() - 1;
         if (nColumn >= 0) {
@@ -329,7 +335,7 @@ public class Principal {
         }
 
     }
-    
+
     // Metodo en donde se agrega los paneles de la parte de abajo
     private void componentesFooter() {
         JPanel panelBotonesBorder = new JPanel(new BorderLayout());
@@ -369,6 +375,8 @@ public class Principal {
         botonAnalisisSintactico.setForeground(fondoForeBoton);
         panelBotones.add(botonAnalisisSintactico);
 
+        botonAnalisisSintactico.addActionListener(eventoBotonSintactico());
+
         botonAnalisisSemantico = new JButton("Analisis Semantico");
         botonAnalisisSemantico.setFont(new Font("Arial", 3, 10));
         botonAnalisisSemantico.setBackground(fondoBackBoton);
@@ -381,28 +389,62 @@ public class Principal {
             AnalizadorLexico analizadorLexico = new AnalizadorLexico(this);
             analizadorLexico.setBuffer(editor.getText());
             limpiarTabla();
-            List<Token> tokens = analizadorLexico.siguienteToken();
+            analizadorLexico.lexico();
+            listaTokens = analizadorLexico.getListaTokens();
+            //Token listaTokens = analizadorLexico.operadoresAritmeticos();
             String token[] = new String[2];
-            for (int i = 0; i < tokens.size(); i++) {
-                token[0] = tokens.get(i).getNombre();
-                token[1] = tokens.get(i).getValor();
+            /*if (listaTokens != null) {
+                token[0] = listaTokens.getNombre();
+                token[1] = listaTokens.getValor();
                 dtmTT.addRow(token);
-
+            }*/
+            for (int i = 0; i < listaTokens.size(); i++) {
+                if (listaTokens.get(i) != null) {
+                    token[0] = listaTokens.get(i).getNombre();
+                    token[1] = listaTokens.get(i).getValor();
+                    dtmTT.addRow(token);
+                }
             }
+
             limpiarTablaErrores();
             List<mx.unach.compilador.Error> errores = analizadorLexico.getListaErrores();
+            errores.stream().forEach(e -> System.out.println(e.toString()));
             String error[] = new String[3];
             for (int i = 0; i < errores.size(); i++) {
                 error[0] = String.valueOf(errores.get(i).getFila());
-                
-                if (i == 0)
-                    error[1] = String.valueOf(errores.get(i).getColumna()+1);
-                else 
+
+                if (i == 0) {
+                    error[1] = String.valueOf(errores.get(i).getColumna() + 1);
+                } else {
                     error[1] = String.valueOf(errores.get(i).getColumna());
-                
+                }
+
                 error[2] = errores.get(i).getDescripcion();
                 dtmTE.addRow(error);
 
+            }
+
+        };
+    }
+
+    private ActionListener eventoBotonSintactico() {
+        return (ae) -> {
+            if (listaTokens != null) {
+                AnalizadorSintactico analizadorSintactico = new AnalizadorSintactico();
+                analizadorSintactico.setListaTokens(listaTokens);
+                analizadorSintactico.sintactico();
+                List<mx.unach.compilador.Error> errores = analizadorSintactico.getListaErrores();
+                errores.forEach(e -> System.out.println(e));
+                String error[] = new String[3];
+                if (errores != null) {
+                    for (int i = 0; i < errores.size(); i++) {
+                        error[0] = String.valueOf(errores.get(i).getFila());
+                        error[2] = errores.get(i).getDescripcion();
+                        dtmTE.addRow(error);
+                    }
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Genere los tokens con el Analizador Lexico");
             }
 
         };

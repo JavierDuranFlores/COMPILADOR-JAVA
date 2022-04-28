@@ -1,0 +1,18 @@
+vacuum main (){
+	totum a;
+	supernatet b;	
+	toturn c;
+	toturn d= 5;
+	toturn e  = 35.22;
+	ita (a > b) {
+		totum a = 10;
+	};
+	totum edad;
+	supernatet num = 2.2;
+	ita (a < c) {
+		toturn f = a;
+	};
+	dum ( a < 10 ) {
+		totum id = 6;
+	};
+};
